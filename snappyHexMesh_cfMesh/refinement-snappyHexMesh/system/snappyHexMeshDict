@@ -1,0 +1,198 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2306                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      snappyHexMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+castellatedMesh true;
+snap            true;
+addLayers       false;
+
+	geometry
+	{
+		plate.stl
+		{
+			type triSurfaceMesh;
+			name plate;
+		}
+		
+		refinementBox0
+		{
+			type box;
+			min  (-0.5  0.0 -0.05);
+			max  ( 0.0  0.5  0.05);
+		}
+		
+		refinementBox1
+		{
+			type box;
+			min  ( 0.0  0.0 -0.05);
+			max  ( 0.5  0.5  0.05);
+		}
+		
+		refinementBox2
+		{
+			type box;
+			min  (-0.5 -0.5 -0.05);
+			max  ( 0.0  0.0  0.05);
+		}
+		
+		refinementBox3
+		{
+			type box;
+			min  ( 0.0 -0.5 -0.05);
+			max  ( 0.5  0.0  0.05);
+		}
+		
+	}
+
+
+castellatedMeshControls
+{
+
+    maxLocalCells 100000;
+    maxGlobalCells 2000000;
+    minRefinementCells 10;
+    maxLoadUnbalance 0.10;
+
+    nCellsBetweenLevels 1;
+
+    features
+    (
+        {
+           file "plate.eMesh";
+           levels ((1 1));
+        }
+    );
+
+
+    refinementSurfaces
+    {
+        plate
+        {
+            level (0 1);
+        }
+    }
+
+    resolveFeatureAngle 10;
+
+    refinementRegions
+    {
+		refinementBox0
+        {
+            mode inside;
+            levels ((1E15 3));
+        }
+		
+		refinementBox1
+        {
+            mode inside;
+            levels ((1E15 2));
+        }
+		
+		refinementBox2
+        {
+            mode inside;
+            levels ((1E15 2));
+        }
+		
+		refinementBox3
+        {
+            mode inside;
+            levels ((1E15 3));
+        }
+    }
+
+
+    locationInMesh (0 0 0);
+
+    allowFreeStandingZoneFaces true;
+}
+
+
+snapControls
+{
+
+    nSmoothPatch 3;
+
+    tolerance 4.0;
+
+    nSolveIter 30;
+
+    nRelaxIter 5;
+
+	nFeatureSnapIter 0;
+
+	implicitFeatureSnap true;
+
+	explicitFeatureSnap false;
+
+	multiRegionFeatureSnap false;
+}
+
+addLayersControls
+{
+
+    relativeSizes true;
+
+    layers
+    {
+
+    }
+
+    expansionRatio 1.0;
+
+    finalLayerThickness 0.3;
+
+    minThickness 0.1;
+
+    nGrow 0;
+
+    featureAngle 30;
+
+    slipFeatureAngle 30;
+
+    nRelaxIter 3;
+
+    nSmoothSurfaceNormals 1;
+
+    nSmoothNormals 3;
+
+    nSmoothThickness 10;
+
+    maxFaceThicknessRatio 0.5;
+
+    maxThicknessToMedialRatio 0.3;
+
+    minMedialAxisAngle 90;
+
+    nBufferCellsNoExtrude 0;
+
+    nLayerIter 50;
+}
+
+meshQualityControls
+{
+    #include "meshQualityDict"	
+	maxNonOrtho 50;
+	maxBoundarySkewness 10;
+	maxInternalSkewness 2;
+	maxConcave 70;
+    nSmoothScale 4;
+    errorReduction 0.75;
+}
+
+mergeTolerance 1e-6;
+
+
+// ************************************************************************* //
